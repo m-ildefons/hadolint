@@ -10,7 +10,6 @@ where
 
 import Data.Aeson hiding (Result)
 import qualified Data.ByteString.Lazy as B
-import Data.Monoid ((<>))
 import Data.Sequence (Seq)
 import qualified Data.Text as Text
 import GHC.Generics

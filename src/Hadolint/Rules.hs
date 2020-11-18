@@ -7,7 +7,6 @@ import Control.Arrow ((&&&))
 import Data.List (foldl', isInfixOf, isPrefixOf, mapAccumL, nub)
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as Map
-import Data.Semigroup (Semigroup, (<>))
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import Data.Void (Void)
@@ -723,29 +722,28 @@ aptGetNoRecommends = instructionRule code severity message check
 isArchive :: Text.Text -> Bool
 isArchive path =
   or
-    ( [ ftype `Text.isSuffixOf` path
-        | ftype <-
-            [ ".tar",
-              ".gz",
-              ".bz2",
-              ".xz",
-              ".zip",
-              ".tgz",
-              ".tb2",
-              ".tbz",
-              ".tbz2",
-              ".lz",
-              ".lzma",
-              ".tlz",
-              ".txz",
-              ".Z",
-              ".tZ"
-            ]
-      ]
-    )
+    [ ftype `Text.isSuffixOf` path
+      | ftype <-
+          [ ".tar",
+            ".gz",
+            ".bz2",
+            ".xz",
+            ".zip",
+            ".tgz",
+            ".tb2",
+            ".tbz",
+            ".tbz2",
+            ".lz",
+            ".lzma",
+            ".tlz",
+            ".txz",
+            ".Z",
+            ".tZ"
+          ]
+    ]
 
 isUrl :: Text.Text -> Bool
-isUrl path = or ([proto `Text.isPrefixOf` path | proto <- ["https://", "http://"]])
+isUrl path = or [proto `Text.isPrefixOf` path | proto <- ["https://", "http://"]]
 
 copyInsteadAdd :: Rule
 copyInsteadAdd = instructionRule code severity message check

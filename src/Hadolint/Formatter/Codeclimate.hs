@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as B
 import Data.Sequence (Seq)
 import qualified Data.Text as Text
 import GHC.Generics
-import Hadolint.Formatter.Format (Result (..), errorPosition)
+import Hadolint.Formatter.Format (Result (..), errorPosition, severityText)
 import Hadolint.Rules (Metadata (..), RuleCheck (..))
 import ShellCheck.Interface
 import Text.Megaparsec (TraversableStream)
@@ -66,7 +66,7 @@ errorToIssue err =
     { checkName = "DL1000",
       description = errorBundlePretty err,
       location = LocPos (sourceName pos) Pos {..},
-      impact = severityText ErrorC
+      impact = severityText (Just ErrorC)
     }
   where
     pos = errorPosition err
@@ -81,14 +81,6 @@ checkToIssue RuleCheck {..} =
       location = LocLine (Text.unpack filename) linenumber,
       impact = severityText (severity metadata)
     }
-
-severityText :: Severity -> String
-severityText severity =
-  case severity of
-    ErrorC -> "blocker"
-    WarningC -> "major"
-    InfoC -> "info"
-    StyleC -> "minor"
 
 formatResult :: (VisualStream s, TraversableStream s, ShowErrorComponent e) => Result s e -> Seq Issue
 formatResult (Result errors checks) = allIssues

@@ -10,11 +10,17 @@ import Control.DeepSeq (NFData)
 import Data.List (foldl', isInfixOf, isPrefixOf, mapAccumL, nub)
 import Data.List.NonEmpty (toList)
 import Data.List.Index
+import Data.Either
+import Data.Maybe
+import Data.Time.LocalTime
+import Data.Time.RFC3339
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import Data.Void (Void)
 import GHC.Generics (Generic)
+import Distribution.Parsec
+import Distribution.SPDX.Extra
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
 import ShellCheck.Interface (Severity (..))
@@ -237,7 +243,24 @@ rules =
     dnfVersionPinned,
     pipNoCacheDir,
     noIllegalInstructionInOnbuild,
-    noSelfreferencingEnv
+    noSelfreferencingEnv,
+    missingOCITitle,
+    missingOCIDescription,
+    missingOCIAuthors,
+    missingOCIRevision,
+    missingOCIVendor,
+    missingOCIURL,
+    missingOCIDocumentation,
+    missingOCISource,
+    missingOCIRefName,
+    missingOCICreated,
+    missingOCIVersion,
+    missingOCILicenses,
+    isURLOCIURL,
+    isURLOCIDocumentation,
+    isURLOCISource,
+    isValidTimeformatOCICreated,
+    isValidLicenseOCILicense
   ]
 
 optionalRules :: RulesConfig -> [Rule]
@@ -1234,3 +1257,168 @@ noSelfreferencingEnv = instructionRuleState code severity message check Set.empt
         -- all characters valid in the inner of a shell variable name
         varChar :: String
         varChar = ['0'..'9'] ++ ['a'..'z'] ++ ['A'..'Z'] ++ ['_']
+
+missingOCITitle :: Rule
+missingOCITitle dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0001"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.title missing"
+    check = checkLabelMissing "org.opencontainers.image.title" dockerfile
+
+missingOCIDescription :: Rule
+missingOCIDescription dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0002"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.description missing"
+    check = checkLabelMissing "org.opencontainers.image.description" dockerfile
+
+missingOCIAuthors :: Rule
+missingOCIAuthors dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0003"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.authors missing"
+    check = checkLabelMissing "org.opencontainers.image.authors" dockerfile
+
+missingOCIRevision :: Rule
+missingOCIRevision dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0004"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.revision missing"
+    check = checkLabelMissing "org.opencontainers.image.revision" dockerfile
+
+missingOCIVendor :: Rule
+missingOCIVendor dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0005"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.vendor missing"
+    check = checkLabelMissing "org.opencontainers.image.vendor" dockerfile
+
+missingOCIURL :: Rule
+missingOCIURL dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0006"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.url missing"
+    check = checkLabelMissing "org.opencontainers.image.url" dockerfile
+
+missingOCIDocumentation :: Rule
+missingOCIDocumentation dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0007"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.documentation missing"
+    check = checkLabelMissing "org.opencontainers.image.documentation" dockerfile
+
+missingOCISource :: Rule
+missingOCISource dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0008"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.source missing"
+    check = checkLabelMissing "org.opencontainers.image.source" dockerfile
+
+missingOCIVersion :: Rule
+missingOCIVersion dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0009"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.version missing"
+    check = checkLabelMissing "org.opencontainers.image.version" dockerfile
+
+missingOCIRefName :: Rule
+missingOCIRefName dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0010"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.ref.name missing"
+    check = checkLabelMissing "org.opencontainers.image.ref.name" dockerfile
+
+missingOCILicenses :: Rule
+missingOCILicenses dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0011"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.licenses missing"
+    check = checkLabelMissing "org.opencontainers.image.licenses" dockerfile
+
+missingOCICreated :: Rule
+missingOCICreated dockerfile = instructionRuleState code severity message check Nothing dockerfile
+  where
+    code = "OCI0012"
+    severity = DLInfoC
+    message = "label org.opencontainers.image.created missing"
+    check = checkLabelMissing "org.opencontainers.image.created" dockerfile
+
+checkLabelMissing :: Text.Text -> [InstructionPos args1] -> Maybe a -> p -> Instruction args2 -> (Maybe a, Bool)
+checkLabelMissing label dockerfile = check
+  where
+    check _ _ From {}
+      | null (allLabels dockerfile) = withState Nothing False
+      | null [(ln, la) | (ln, la) <- allLabels dockerfile,
+                         label `elem` map fst la] = withState Nothing False
+      | otherwise = withState Nothing True
+    check st _ _ = withState st True
+    allLabels df = [(ln, la) | (ln, Label la) <- instr]
+      where
+        instr = fmap (lineNumber &&& instruction) df
+
+isURLOCIURL :: Rule
+isURLOCIURL = instructionRule code severity message check
+  where
+    code = "OCI0013"
+    severity = DLWarningC
+    message = "label org.opencontainers.image.url is not a valid URL"
+    check (Label ls) = null $ getBadURLLabels "org.opencontainers.image.url" ls
+    check _ = True
+
+isURLOCIDocumentation :: Rule
+isURLOCIDocumentation = instructionRule code severity message check
+  where
+    code = "OCI0014"
+    severity = DLWarningC
+    message = "label org.opencontainers.image.url is not a valid URL"
+    check (Label ls) = null $ getBadURLLabels "org.opencontainers.image.documentation" ls
+    check _ = True
+
+isURLOCISource :: Rule
+isURLOCISource = instructionRule code severity message check
+  where
+    code = "OCI0015"
+    severity = DLWarningC
+    message = "label org.opencontainers.image.source is not a valid URL"
+    check (Label ls) = null $ getBadURLLabels "org.opencontainers.image.source" ls
+    check _ = True
+
+getBadURLLabels :: (Eq l) => l -> [(l, Text.Text)] -> [(l, Text.Text)]
+getBadURLLabels lbl prs = [(l, u) | (l, u) <- prs, l == lbl, isMalformed u]
+  where
+    isMalformed url
+      | "http://" `Text.isPrefixOf` url = False
+      | "https://" `Text.isPrefixOf` url = False
+      | "www." `Text.isPrefixOf` url = False
+      | otherwise = True
+
+isValidTimeformatOCICreated :: Rule
+isValidTimeformatOCICreated = instructionRule code severity message check
+  where
+    code = "OCI0016"
+    severity = DLWarningC
+    message = "label org.opencontainers.image.created is invalid time format - must be RFC3339."
+    check (Label ls) = null $ getBadTimeformatLabels "org.opencontainers.image.created" ls
+    check _ = True
+    getBadTimeformatLabels label pairs = [(l, v) | (l, v) <- pairs, l == label, isNothing $ parseTimeRFC3339 v]
+
+isValidLicenseOCILicense :: Rule
+isValidLicenseOCILicense = instructionRule code severity message check
+  where
+    code = "OCI0017"
+    severity = DLWarningC
+    message = "label org.opencontainers.image.license is not a valid SPDX identifier."
+    check (Label ls) = null $ getBadLicenseLabels "org.opencontainers.image.license" ls
+    check _ = True
+    getBadLicenseLabels label pairs = [(l, v) | (l, v) <- pairs, l == label, isLeft (eitherParsec (Text.unpack v) :: Either String LicenseId)]

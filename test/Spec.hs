@@ -1449,6 +1449,294 @@ main =
       it "fail with selfreferencing without curly braces ENV" $
         ruleCatches noSelfreferencingEnv "ENV BLA=\"blubb\" BLUBB=\"$BLA/blubb\""
     --
+    describe "OCI Annotations" $ do
+      it "warn on missing label org.opencontainers.image.title" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCITitle $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.title" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.title=\"Title\""
+              ]
+        in ruleCatchesNot missingOCITitle $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.description" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIDescription $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.description" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.description=\"Description\""
+              ]
+        in ruleCatchesNot missingOCIDescription $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.authors" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIAuthors $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.authors" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.authors=\"Mr. Anderson\""
+              ]
+        in ruleCatchesNot missingOCIAuthors $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.revision" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIRevision $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.revision" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.revision=\"rev00000\""
+              ]
+        in ruleCatchesNot missingOCIRevision $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.vendor" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIVendor $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.vendor" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.vendor=\"Metacortex\""
+              ]
+        in ruleCatchesNot missingOCIVendor $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.url" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIURL $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.url" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.url=\"website\""
+              ]
+        in ruleCatchesNot missingOCIURL $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.created" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCICreated $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.created" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"2020-11-30T01:01:01\""
+              ]
+        in ruleCatchesNot missingOCICreated $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.licenses" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCILicenses $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.licenses" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.licenses=\"BSD-3-Clause\""
+              ]
+        in ruleCatchesNot missingOCILicenses $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.ref.name" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIRefName $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.ref.name" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.ref.name=\"bla/blubb\""
+              ]
+        in ruleCatchesNot missingOCIRefName $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.version" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIVersion $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.version" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.version=\"1.0.0\""
+              ]
+        in ruleCatchesNot missingOCIVersion $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.documentation" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCIDocumentation $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.documentation" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.documentation=\"docs\""
+              ]
+        in ruleCatchesNot missingOCIDocumentation $ Text.unlines dockerFile
+
+      it "warn on missing label org.opencontainers.image.source" $
+        let dockerFile =
+              [ "FROM scratch"
+              ]
+        in ruleCatches missingOCISource $ Text.unlines dockerFile
+
+      it "do not warn on label org.opencontainers.image.source" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.source=\"someplace\""
+              ]
+        in ruleCatchesNot missingOCISource $ Text.unlines dockerFile
+
+      it "warn on malformed label org.opencontainers.image.url" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.url=\"malformed\""
+              ]
+        in ruleCatches isURLOCIURL $ Text.unlines dockerFile
+
+      it "do not warn on well formed label org.opencontainers.image.url" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.url=\"https://example.com\""
+              ]
+        in ruleCatchesNot isURLOCIURL $ Text.unlines dockerFile
+
+      it "warn on malformed label org.opencontainers.image.documentation" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.documentation=\"malformed\""
+              ]
+        in ruleCatches isURLOCIDocumentation $ Text.unlines dockerFile
+
+      it "do not warn on well formed label org.opencontainers.image.documentation" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.documentation=\"https://docs.example.com\""
+              ]
+        in ruleCatchesNot isURLOCIDocumentation $ Text.unlines dockerFile
+
+      it "warn on malformed label org.opencontainers.image.source" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.source=\"malformed\""
+              ]
+        in ruleCatches isURLOCISource $ Text.unlines dockerFile
+
+      it "do not warn on well formed label org.opencontainers.image.source" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.source=\"https://src.example.com\""
+              ]
+        in ruleCatchesNot isURLOCISource $ Text.unlines dockerFile
+      it "warn on malformed label org.opencontainers.image.created" $
+        let dockerfile1 =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"2020\""
+              ]
+            dockerfile2 =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"1.1.2020 07:08:44\""
+              ]
+            dockerfile3 =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"1.1.2020 07:08:44\""
+              ]
+        in do
+          ruleCatches isValidTimeformatOCICreated $ Text.unlines dockerfile1
+          ruleCatches isValidTimeformatOCICreated $ Text.unlines dockerfile2
+          ruleCatches isValidTimeformatOCICreated $ Text.unlines dockerfile3
+      it "do not warn on well formed label org.opencontainers.image.created" $ do
+          ruleCatchesNot isValidTimeformatOCICreated "LABEL org.opencontainers.image.created=\"1985-04-12T23:20:50.52Z\""
+          ruleCatchesNot isValidTimeformatOCICreated "LABEL org.opencontainers.image.created=\"1996-12-19T16:39:57-08:00\""
+          ruleCatchesNot isValidTimeformatOCICreated "LABEL org.opencontainers.image.created=\"1990-12-31T23:59:60Z\""
+          ruleCatchesNot isValidTimeformatOCICreated "LABEL org.opencontainers.image.created=\"1990-12-31T15:59:60-08:00\""
+          ruleCatchesNot isValidTimeformatOCICreated "LABEL org.opencontainers.image.created=\"1937-01-01T12:00:27.87+00:20\""
+      it "warn on malformed label org.opencontainers.image.license" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.license=\"BSD3\""
+              ]
+        in ruleCatches isValidLicenseOCILicense $ Text.unlines dockerFile
+
+      it "do not warn on well formed label org.opencontainers.image.license" $
+        let dockerFile =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.license=\"BSD-3-Clause\""
+              ]
+        in ruleCatchesNot isValidLicenseOCILicense $ Text.unlines dockerFile
+    --
+      it "do not emit any OCI label warning on well formed dockerfiles" $
+        let dockerFile1 =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"1990-12-31T15:59:60-08:00\"",
+                "LABEL org.opencontainers.image.authors=\"somebody\"",
+                "LABEL org.opencontainers.image.url=\"https://example.com\"",
+                "LABEL org.opencontainers.image.documentation=\"https://docs.example.com\"",
+                "LABEL org.opencontainers.image.source=\"https://github.com/example\"",
+                "LABEL org.opencontainers.image.version=\"1.0.0\"",
+                "LABEL org.opencontainers.image.revision=\"1\"",
+                "LABEL org.opencontainers.image.vendor=\"Example\"",
+                "LABEL org.opencontainers.image.licenses=\"BSD-3-Clause\"",
+                "LABEL org.opencontainers.image.ref.name=\"example/example\"",
+                "LABEL org.opencontainers.image.title=\"Example Image\"",
+                "LABEL org.opencontainers.image.description=\"Just an example\""
+              ]
+            dockerFile2 =
+              [ "FROM scratch",
+                "LABEL org.opencontainers.image.created=\"1985-04-12T23:20:50.52Z\" \\",
+                "      org.opencontainers.image.authors=\"somebody\" \\",
+                "      org.opencontainers.image.url=\"https://example.com\" \\",
+                "      org.opencontainers.image.documentation=\"https://docs.example.com\" \\",
+                "      org.opencontainers.image.source=\"https://github.com/example\" \\",
+                "      org.opencontainers.image.version=\"1.0.0\" \\",
+                "      org.opencontainers.image.revision=\"1\" \\",
+                "      org.opencontainers.image.vendor=\"Example\" \\",
+                "      org.opencontainers.image.licenses=\"BSD-3-Clause\" \\",
+                "      org.opencontainers.image.ref.name=\"example/example\" \\",
+                "      org.opencontainers.image.title=\"Example Image\" \\",
+                "      org.opencontainers.image.description=\"Just an example\""
+              ]
+            testOCIDockerFileOK :: [Text.Text] -> IO ()
+            testOCIDockerFileOK df = do
+              ruleCatchesNot missingOCICreated $ Text.unlines df
+              ruleCatchesNot missingOCIAuthors $ Text.unlines df
+              ruleCatchesNot missingOCIURL $ Text.unlines df
+              ruleCatchesNot missingOCIDocumentation $ Text.unlines df
+              ruleCatchesNot missingOCISource $ Text.unlines df
+              ruleCatchesNot missingOCIVersion $ Text.unlines df
+              ruleCatchesNot missingOCIRevision $ Text.unlines df
+              ruleCatchesNot missingOCIVendor $ Text.unlines df
+              ruleCatchesNot missingOCILicenses $ Text.unlines df
+              ruleCatchesNot missingOCIRefName $ Text.unlines df
+              ruleCatchesNot missingOCITitle $ Text.unlines df
+              ruleCatchesNot missingOCIDescription $ Text.unlines df
+              ruleCatchesNot isURLOCIURL $ Text.unlines df
+              ruleCatchesNot isURLOCIDocumentation $ Text.unlines df
+              ruleCatchesNot isURLOCISource $ Text.unlines df
+              ruleCatchesNot isValidTimeformatOCICreated $ Text.unlines df
+        in do
+          testOCIDockerFileOK dockerFile1
+          testOCIDockerFileOK dockerFile2
+    --
     describe "Regression Tests" $ do
       it "Comments with backslashes at the end are just comments" $
         let dockerFile =

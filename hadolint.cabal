@@ -71,6 +71,10 @@ library
     , split >=0.2
     , text
     , void
+    , spdx
+    , Cabal
+    , time
+    , timerep >=2.0
   default-language: Haskell2010
 
 executable hadolint

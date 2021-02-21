@@ -9,6 +9,7 @@ import Control.Arrow ((&&&))
 import Control.DeepSeq (NFData)
 import Data.List (foldl', isInfixOf, isPrefixOf, mapAccumL, nub)
 import Data.List.NonEmpty (toList)
+import Data.List.Index
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
@@ -1187,21 +1188,22 @@ noIllegalInstructionInOnbuild = instructionRule code severity message check
     check _ = True
 
 noSelfreferencingEnv :: Rule
-noSelfreferencingEnv = instructionRuleState code severity message check []
+noSelfreferencingEnv = instructionRuleState code severity message check Set.empty
   where
     code = "DL3044"
     severity = DLErrorC
     message = "Do not refer to an environment variable within the same `ENV` statement where it is defined."
-    check st _ (Env pairs) = withState (nub $ st ++ map fst pairs) $
-        null [ env | env <- listOfReferences pairs, env `notElem` st ]
-    check st _ (Arg arg _) = withState (nub $ st ++ [arg]) True
+    check st _ (Env pairs) = withState (Set.union st (Set.fromList (map fst pairs))) $
+        null [ env | env <- listOfReferences pairs, env `Set.notMember` st ]
+    check st _ (Arg arg _) = withState (Set.insert arg st) True
     check st _ _ = withState st True
 
     -- generates a list of references to variable names referenced on the right
-    -- hand side of a variable definition
+    -- hand side of a variable definition, except when the variable is
+    -- referenced on its own right hand side.
     listOfReferences :: Pairs -> [Text.Text]
-    listOfReferences prs = [ var | var <- map fst prs,
-                                   var `isSubstringOfAny` map snd prs ]
+    listOfReferences prs = [ var | (idx, (var, _)) <- indexed prs,
+                                   var `isSubstringOfAny` map (snd . snd) (filter ((/= idx) . fst) (indexed prs))]
     -- is a reference of a variable substring of any text?
     -- matches ${var_name} and $var_name, but not $var_nameblafoo
     isSubstringOfAny :: Text.Text -> [Text.Text] -> Bool

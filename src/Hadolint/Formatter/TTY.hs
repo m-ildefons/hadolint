@@ -9,6 +9,7 @@ module Hadolint.Formatter.TTY
 where
 
 import Colourista
+import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
 import Hadolint.Formatter.Format
 import Hadolint.Rules
@@ -42,7 +43,8 @@ printResult :: (VisualStream s, TraversableStream s, ShowErrorComponent e) => Re
 printResult Result {errors, checks} color = printErrors >> printChecks
   where
     printErrors = mapM_ putStrLn (formatErrors errors)
-    printChecks = mapM_ (putStrLn . Text.unpack) (formatChecks checks color)
+    printChecks = mapM_ (putStrLn . Text.unpack) (formatChecks checks color
+                                                  Seq.>< formatNumberOfViolations checks)
 
 colorizedSeverity :: DLSeverity -> Text.Text
 colorizedSeverity s =
@@ -52,3 +54,11 @@ colorizedSeverity s =
     DLInfoC -> Text.pack $ formatWith [green] $ severityText s
     DLStyleC -> Text.pack $ formatWith [cyan] $ severityText s
     _ -> Text.pack $ severityText s
+
+formatNumberOfViolations :: Seq.Seq RuleCheck -> Seq.Seq Text.Text
+formatNumberOfViolations rc
+  | Seq.length rc == 0 = Seq.empty
+  | otherwise = Seq.empty Seq.|> Text.pack "-------------------------------"
+                          Seq.|> Text.pack "Found "
+                             <> (Text.pack . show . Seq.length) rc
+                             <> Text.pack " rule violations."

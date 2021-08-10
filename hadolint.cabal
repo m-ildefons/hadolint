@@ -101,6 +101,7 @@ library
       Hadolint.Rule.DL3058
       Hadolint.Rule.DL3059
       Hadolint.Rule.DL3060
+      Hadolint.Rule.DL3061
       Hadolint.Rule.DL4000
       Hadolint.Rule.DL4001
       Hadolint.Rule.DL4003
@@ -249,6 +250,7 @@ test-suite hadolint-unit-tests
       DL3058
       DL3059
       DL3060
+      DL3061
       DL4000
       DL4001
       DL4003

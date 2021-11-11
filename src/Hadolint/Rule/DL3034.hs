@@ -1,11 +1,12 @@
 module Hadolint.Rule.DL3034 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
 
-rule :: Rule Shell.ParsedShell
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = simpleRule code severity message check
   where
     code = "DL3034"
     severity = DLWarningC

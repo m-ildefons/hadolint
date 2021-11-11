@@ -2,6 +2,7 @@ module Hadolint.Rule.DL3016 (rule) where
 
 import Data.List (isPrefixOf)
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Hadolint.Shell (ParsedShell)
 import qualified Hadolint.Shell as Shell
@@ -15,8 +16,8 @@ import Language.Docker.Syntax (Instruction (..), RunArgs (..))
 --    npm install [<@scope>/]<name>@<version>
 --    npm install git[+http|+https]://<git-host>/<git-user>/<repo-name>[#<commit>|#semver:<semver>]
 --    npm install git+ssh://<git-host>:<git-user>/<repo-name>[#<commit>|#semver:<semver>]
-rule :: Rule ParsedShell
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule ParsedShell
+rule _ = simpleRule code severity message check
   where
     code = "DL3016"
     severity = DLWarningC

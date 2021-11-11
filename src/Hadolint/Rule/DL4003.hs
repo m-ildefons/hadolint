@@ -1,12 +1,13 @@
 module Hadolint.Rule.DL4003 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax (Instruction (..))
 
 data HasCmd = HasCmd | NoCmd
 
-rule :: Rule args
-rule = customRule check (emptyState NoCmd)
+rule :: Configuration -> Rule args
+rule _ = customRule check (emptyState NoCmd)
   where
     code = "DL4003"
     severity = DLWarningC

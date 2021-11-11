@@ -50,6 +50,7 @@ library
       Hadolint.Pragma
       Hadolint.Process
       Hadolint.Rule
+      Hadolint.Rule.Auto
       Hadolint.Rule.DL3000
       Hadolint.Rule.DL3001
       Hadolint.Rule.DL3002
@@ -138,7 +139,7 @@ library
   build-depends:
       Cabal
     , HsYAML
-    , ShellCheck >=0.7.1
+    , ShellCheck >=0.8
     , aeson
     , base >=4.8 && <5
     , bytestring
@@ -152,9 +153,10 @@ library
     , filepath
     , foldl
     , gitrev >=1.3.1
+    , hadolint-discover
     , ilist
     , language-docker >=10.3.0 && <11
-    , megaparsec >=9.0.0
+    , megaparsec >=9.2.0
     , mtl
     , network-uri
     , optparse-applicative >=0.14.0
@@ -194,8 +196,9 @@ executable hadolint
     , containers
     , data-default
     , hadolint
+    , hadolint-discover
     , language-docker >=10.3.0 && <11
-    , megaparsec >=9.0.0
+    , megaparsec >=9.2.0
     , optparse-applicative >=0.14.0
     , prettyprinter >=1.7.0
     , text
@@ -214,6 +217,7 @@ test-suite hadolint-unit-tests
       Hadolint.Config.SpecHook
       Hadolint.Formatter.ParseErrorSpec
       Hadolint.Formatter.SarifSpec
+      Hadolint.Formatter.SonarQubeSpec
       Hadolint.Formatter.TTYSpec
       Hadolint.PragmaSpec
       Hadolint.Rule.DL3000Spec
@@ -305,7 +309,7 @@ test-suite hadolint-unit-tests
   build-depends:
       HUnit >=1.2
     , HsYAML
-    , ShellCheck >=0.7.1
+    , ShellCheck >=0.8
     , aeson
     , base >=4.8 && <5
     , bytestring >=0.10
@@ -313,9 +317,10 @@ test-suite hadolint-unit-tests
     , data-default
     , foldl
     , hadolint
+    , hadolint-discover
     , hspec >=2.8.3
     , language-docker >=10.3.0 && <11
-    , megaparsec >=9.0.0
+    , megaparsec >=9.2.0
     , optparse-applicative >=0.14.0
     , silently
     , split >=0.2

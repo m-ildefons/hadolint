@@ -1,11 +1,12 @@
 module Hadolint.Rule.DL3021 (rule) where
 
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 
-rule :: Rule args
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule args
+rule _ = simpleRule code severity message check
   where
     code = "DL3021"
     severity = DLErrorC

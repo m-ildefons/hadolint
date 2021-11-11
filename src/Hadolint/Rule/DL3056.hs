@@ -4,13 +4,14 @@ import Data.Either
 import qualified Data.Map as Map
 import qualified Data.SemVer as SemVer
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotSemVerRule (Map.keys (Map.filter (== SemVer) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotSemVerRule (Map.keys (Map.filter (== SemVer) labelSchema))
 {-# INLINEABLE rule #-}
 
 labelIsNotSemVerRule :: LabelName -> Rule args

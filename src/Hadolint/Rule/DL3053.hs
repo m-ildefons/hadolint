@@ -3,13 +3,14 @@ module Hadolint.Rule.DL3053 (rule) where
 import qualified Data.Map as Map
 import Data.Maybe
 import Data.Time.RFC3339
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotRFC3339Rule (Map.keys (Map.filter (== Rfc3339) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotRFC3339Rule (Map.keys (Map.filter (== Rfc3339) labelSchema))
 {-# INLINEABLE rule #-}
 
 

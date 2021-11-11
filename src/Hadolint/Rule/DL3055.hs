@@ -2,13 +2,14 @@ module Hadolint.Rule.DL3055 (rule) where
 
 import qualified Data.Map as Map
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotGitHashRule (Map.keys (Map.filter (== GitHash) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotGitHashRule (Map.keys (Map.filter (== GitHash) labelSchema))
 {-# INLINEABLE rule #-}
 
 labelIsNotGitHashRule :: LabelName -> Rule args

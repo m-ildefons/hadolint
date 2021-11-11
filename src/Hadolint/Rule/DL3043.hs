@@ -1,10 +1,11 @@
 module Hadolint.Rule.DL3043 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 
-rule :: Rule args
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule args
+rule _ = simpleRule code severity message check
   where
     code = "DL3043"
     severity = DLErrorC

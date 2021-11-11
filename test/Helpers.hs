@@ -125,14 +125,15 @@ passesShellcheck checks =
 
 
 assertFormatter ::
-  (HasCallStack, ?noColor :: Bool) =>
+  ( Foldable f,
+    HasCallStack,
+    ?noColor :: Bool
+  ) =>
   OutputFormat ->
-  [CheckFailure] ->
+  f (Result Text.Text DockerfileError) ->
   String ->
   Assertion
-assertFormatter formatter failures expectation = do
-  let results =
-        NonEmpty.fromList [Result "<string>" mempty (Seq.fromList failures)]
+assertFormatter formatter results expectation = do
   (cap, _) <- capture
                 (printResults formatter ?noColor (Just "<string>") results)
   cap `shouldBe` expectation

@@ -1,0 +1,95 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           hadolint-discover
+version:        0.0.1
+synopsis:       Automatically discover and include rules.
+description:    Automatically discover and include rules. This driver is inspired by
+                hspec-discover and basically a blatant trimmed down ripoff of that code. It
+                is build for the sole purpose of automatically including all rule modules of
+                Hadolint and generating an \'autorule\' from them. This reduces the amount of
+                code that needs work to create a new rule because only the rule module
+                (Hadolint.Rule.DLXXXX.hs) and its tests have to be created and dropped into
+                their respective source directories.
+category:       Testing
+stability:      experimental
+homepage:       http://hadolint.github.io/
+bug-reports:    https://github.com/hadolint/hadolint/issues
+author:         Moritz Röhirch <moritz@ildefons.de>
+maintainer:     Moritz Röhirch <moritz@ildefons.de>
+copyright:      (c) 2021 Moritz Röhrich
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/hadolint/hadolint
+  subdir: hadolint-discover
+
+library
+  exposed: False
+  exposed-modules:
+      Hadolint.Discover.Run
+      Hadolint.Discover.Sort
+      Hadolint.Discover.Tree
+  other-modules:
+      Paths_hadolint_discover
+  hs-source-dirs:
+      src
+  default-extensions:
+      FlexibleInstances
+      OverloadedStrings
+  ghc-options: -Wall -Wno-orphans
+  build-depends:
+      base ==4.*
+    , directory
+    , filepath
+    , split
+  default-language: Haskell2010
+
+executable hadolint-discover
+  main-is: hadolint-discover.hs
+  other-modules:
+      Paths_hadolint_discover
+  hs-source-dirs:
+      driver
+  default-extensions:
+      FlexibleInstances
+      OverloadedStrings
+  ghc-options: -Wall -Wno-orphans
+  build-depends:
+      base ==4.*
+    , directory
+    , filepath
+    , hadolint-discover
+    , split
+  default-language: Haskell2010
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Hadolint.Discover.RunSpec
+      Hadolint.Discover.TreeSpec
+      Paths_hadolint_discover
+  hs-source-dirs:
+      test
+  default-extensions:
+      FlexibleInstances
+      OverloadedStrings
+  ghc-options: -Wall -Wno-orphans
+  build-depends:
+      base ==4.*
+    , directory
+    , filepath
+    , hadolint-discover
+    , hspec
+    , hspec-discover
+    , mockery
+    , silently
+    , split
+  default-language: Haskell2010

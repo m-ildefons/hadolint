@@ -1,11 +1,12 @@
 module Hadolint.Rule.DL3026 (rule) where
 
 import qualified Data.Set as Set
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
-rule :: Set.Set Registry -> Rule args
-rule allowed = customRule check (emptyState Set.empty)
+rule :: Configuration -> Rule args
+rule config = customRule check (emptyState Set.empty)
   where
     code = "DL3026"
     severity = DLErrorC
@@ -26,4 +27,7 @@ rule allowed = customRule check (emptyState Set.empty)
       imageName == "scratch"
         || Set.member "docker.io" allowed
         || Set.member "hub.docker.com" allowed
+
+    allowed :: Set.Set Registry
+    allowed = allowedRegistries config
 {-# INLINEABLE rule #-}

@@ -217,3 +217,52 @@ spec = do
           mempty
           False
           DLInfoC
+
+    it "override default with specific configuration: error rules" $ do
+      let config = mempty { partialErrorRules = [ "DL3010", "DL3020" ] }
+          expected = def { errorRules = [ "DL3010", "DL3020" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: warning rules" $ do
+      let config = mempty { partialWarningRules = [ "DL3010", "DL3020" ] }
+          expected = def { warningRules = [ "DL3010", "DL3020" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: info rules" $ do
+      let config = mempty { partialInfoRules = [ "DL3010", "DL3020" ] }
+          expected = def { infoRules = [ "DL3010", "DL3020" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: style rules" $ do
+      let config = mempty { partialStyleRules = [ "DL3010", "DL3020" ] }
+          expected = def { styleRules = [ "DL3010", "DL3020" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: ignore rules" $ do
+      let config = mempty { partialIgnoreRules = [ "DL3010", "DL3020" ] }
+          expected = def { ignoreRules = [ "DL3010", "DL3020" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: label schema" $ do
+      let config =
+            mempty
+              { partialLabelSchema = Map.fromList [ ("email", Email) ] }
+          expected = def { labelSchema = Map.fromList [ ("email", Email) ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: allowed registries" $ do
+      let config =
+            mempty
+              { partialAllowedRegistries = Set.fromList [ "docker.io" ] }
+          expected = def { allowedRegistries = Set.fromList [ "docker.io" ] }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: strict labels" $ do
+      let config = mempty { partialStrictLabels = Just True }
+          expected = def { strictLabels = True }
+      applyPartialConfiguration def config `shouldBe` expected
+
+    it "override default with specific configuration: failure-threshold " $ do
+      let config = mempty { partialFailureThreshold = Just DLErrorC }
+          expected = def { failureThreshold = DLErrorC }
+      applyPartialConfiguration def config `shouldBe` expected

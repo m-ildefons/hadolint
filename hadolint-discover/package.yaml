@@ -1,0 +1,57 @@
+name:             hadolint-discover
+version:          0.0.1
+copyright:        (c) 2021 Moritz Röhrich
+author:           Moritz Röhirch <moritz@ildefons.de>
+maintainer:       Moritz Röhirch <moritz@ildefons.de>
+category:         Testing
+stability:        experimental
+homepage:         http://hadolint.github.io/
+synopsis:         Automatically discover and include rules.
+description: |
+  Automatically discover and include rules. This driver is inspired by
+  hspec-discover and basically a blatant trimmed down ripoff of that code. It
+  is build for the sole purpose of automatically including all rule modules of
+  Hadolint and generating an \'autorule\' from them. This reduces the amount of
+  code that needs work to create a new rule because only the rule module
+  (Hadolint.Rule.DLXXXX.hs) and its tests have to be created and dropped into
+  their respective source directories.
+
+github: hadolint/hadolint/hadolint-discover
+
+ghc-options:
+  - -Wall
+  - -Wno-orphans  # because of 'instance IsString ShowS'
+
+dependencies:
+  - base == 4.*
+  - filepath
+  - directory
+  - split
+
+default-extensions:
+  - FlexibleInstances
+  - OverloadedStrings
+
+library:
+  source-dirs: src
+  exposed: no
+
+executables:
+  hadolint-discover:
+    main: hadolint-discover.hs
+    source-dirs:
+      - driver
+    dependencies:
+      - hadolint-discover
+
+tests:
+  spec:
+    main: Spec.hs
+    source-dirs:
+      - test
+    dependencies:
+      - hadolint-discover
+      - hspec
+      - hspec-discover
+      - mockery
+      - silently

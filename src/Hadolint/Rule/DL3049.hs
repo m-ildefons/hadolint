@@ -4,12 +4,14 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $ fmap missingLabelRule (Map.keys labelschema)
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} =
+  mconcat $ fmap missingLabelRule (Map.keys labelSchema)
 {-# INLINEABLE rule #-}
 
 data StageID = StageID

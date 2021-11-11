@@ -2,14 +2,15 @@ module Hadolint.Rule.DL3058 (rule) where
 
 import qualified Data.Map as Map
 import Text.Email.Validate as Email
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 import Data.Text.Encoding
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotEmailRule (Map.keys (Map.filter (== Email) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotEmailRule (Map.keys (Map.filter (== Email) labelSchema))
 {-# INLINEABLE rule #-}
 
 

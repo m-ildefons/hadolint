@@ -3,6 +3,7 @@ module Hadolint.Rule.DL3002 (rule) where
 import qualified Data.IntMap.Strict as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax (Instruction (..), Linenumber)
 
@@ -15,8 +16,8 @@ data Acc
   | Empty
   deriving (Show)
 
-rule :: Rule args
-rule = veryCustomRule check (emptyState Empty) markFailures
+rule :: Configuration -> Rule args
+rule _ = veryCustomRule check (emptyState Empty) markFailures
   where
     code = "DL3002"
     severity = DLWarningC

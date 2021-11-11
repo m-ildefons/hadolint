@@ -11,3 +11,6 @@ dist-newstyle
 
 # travis wait is generating log in PWD
 travis_wait_*.log
+
+# hpc cache
+*.tix

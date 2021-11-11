@@ -2,6 +2,7 @@ module Hadolint.Rule.DL3060 (rule) where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
@@ -16,8 +17,8 @@ data Acc
   | Empty
   deriving (Show)
 
-rule :: Rule Shell.ParsedShell
-rule = veryCustomRule check (emptyState Empty) markFailures
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = veryCustomRule check (emptyState Empty) markFailures
   where
     code = "DL3060"
     severity = DLInfoC

@@ -6,6 +6,7 @@ import qualified Data.Map.Strict as Map
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 
@@ -23,8 +24,8 @@ data Acc
   = Acc {current :: Stage, workdirSet :: Map Stage Bool}
   | Empty
 
-rule :: Rule args
-rule = customRule check (emptyState Empty)
+rule :: Configuration -> Rule args
+rule _ = customRule check (emptyState Empty)
   where
     code = "DL3045"
     severity = DLWarningC

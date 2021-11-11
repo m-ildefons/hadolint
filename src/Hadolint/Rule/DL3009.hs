@@ -1,5 +1,6 @@
 module Hadolint.Rule.DL3009 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 import qualified Data.Map.Strict as Map
@@ -19,8 +20,8 @@ data Acc
   deriving (Eq, Show)
 
 
-rule :: Rule Shell.ParsedShell
-rule = veryCustomRule check (emptyState Empty) markFailures
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = veryCustomRule check (emptyState Empty) markFailures
   where
     code = "DL3009"
     severity = DLInfoC

@@ -1,12 +1,13 @@
 module Hadolint.Rule.DL4004 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax (Instruction (..))
 
 data HasEntry = HasEntry | NoEntry
 
-rule :: Rule args
-rule = customRule check (emptyState NoEntry)
+rule :: Configuration -> Rule args
+rule _ = customRule check (emptyState NoEntry)
   where
     code = "DL4004"
     severity = DLErrorC

@@ -3,14 +3,15 @@ module Hadolint.Rule.DL3052 (rule) where
 import qualified Data.Map as Map
 import Data.Maybe
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 import Network.URI as Uri
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotUrlRule (Map.keys (Map.filter (== Url) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotUrlRule (Map.keys (Map.filter (== Url) labelSchema))
 {-# INLINEABLE rule #-}
 
 labelIsNotUrlRule :: LabelName -> Rule args

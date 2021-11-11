@@ -16,8 +16,8 @@ where
 import Data.Default
 import Data.Sequence (Seq)
 import Data.Text (Text)
-import Data.Text.Prettyprint.Doc (Pretty, pretty)
 import Data.YAML
+import Prettyprinter (Pretty, pretty)
 import Text.Megaparsec (TraversableStream (..), pstateSourcePos)
 import Text.Megaparsec.Error
 import Text.Megaparsec.Pos (SourcePos, sourcePosPretty)

@@ -18,13 +18,21 @@ spec = do
       printResults TTY True (Just "<string>") results `shouldReturn` ()
 
     it "print some result: no colors" $ do
-      let checkFails = [ CheckFailure
+      let checkFails =
+            NonEmpty.fromList
+              [ Result
+                  { fileName = "<string>",
+                    errors = mempty,
+                    checks =
+                      [ CheckFailure
                           { code = "DL2001",
                             severity = DLInfoC,
                             message = "test",
                             line = 1
                           }
-                       ]
+                      ]
+                  }
+              ]
           expectation = unlines
                           [ "<string>:1 DL2001 info: test"
                           ]
@@ -32,20 +40,34 @@ spec = do
 
     it "print some result: with colors" $ do
       let ?noColor = False
-      let checkFails = [ CheckFailure
+      let checkFails =
+            NonEmpty.fromList
+              [ Result
+                  { fileName = "<string>",
+                    errors = mempty,
+                    checks =
+                      [ CheckFailure
                           { code = "DL2001",
                             severity = DLInfoC,
                             message = "test",
                             line = 1
                           }
                        ]
+                  }
+              ]
           expectation = unlines
                           [ "<string>:1 DL2001 \ESC[92minfo\ESC[0m: test"
                           ]
       assertFormatter TTY checkFails expectation
 
     it "print multiple results: no colors" $ do
-      let checkFails = [ CheckFailure
+      let checkFails =
+            NonEmpty.fromList
+              [ Result
+                  { fileName = "<string>",
+                    errors = mempty,
+                    checks =
+                      [ CheckFailure
                           { code = "DL2001",
                             severity = DLInfoC,
                             message = "test",
@@ -58,6 +80,8 @@ spec = do
                             line = 3
                           }
                        ]
+                  }
+              ]
           expectation = unlines
                           [ "<string>:1 DL2001 info: test",
                             "<string>:3 DL2002 warning: foo"
@@ -66,7 +90,13 @@ spec = do
 
     it "print multiple results: with colors" $ do
       let ?noColor = False
-      let checkFails = [ CheckFailure
+      let checkFails =
+            NonEmpty.fromList
+              [ Result
+                  { fileName = "<string>",
+                    errors = mempty,
+                    checks =
+                      [ CheckFailure
                           { code = "DL2001",
                             severity = DLInfoC,
                             message = "test",
@@ -79,6 +109,8 @@ spec = do
                             line = 3
                           }
                        ]
+                  }
+              ]
           expectation = unlines
                           [ "<string>:1 DL2001 \ESC[92minfo\ESC[0m: test",
                             "<string>:3 DL2002 \ESC[1m\ESC[93mwarning\ESC[0m:\

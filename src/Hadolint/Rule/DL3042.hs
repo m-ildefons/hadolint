@@ -8,6 +8,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
@@ -25,8 +26,8 @@ data Acc
   | Empty
 
 
-rule :: Rule Shell.ParsedShell
-rule = customRule check (emptyState Empty)
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = customRule check (emptyState Empty)
   where
     code = "DL3042"
     severity = DLWarningC

@@ -1,5 +1,6 @@
 module Hadolint.Rule.DL3019 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Hadolint.Shell (ParsedShell)
 import Language.Docker.Syntax
@@ -7,8 +8,8 @@ import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Hadolint.Shell as Shell
 
-rule :: Rule ParsedShell
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule ParsedShell
+rule _ = simpleRule code severity message check
   where
     code = "DL3019"
     severity = DLInfoC

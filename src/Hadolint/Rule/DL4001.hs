@@ -1,12 +1,13 @@
 module Hadolint.Rule.DL4001 (rule) where
 
 import qualified Data.IntSet as Set
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax (Instruction (..), RunArgs (..))
 
-rule :: Rule Shell.ParsedShell
-rule = customRule check (emptyState Set.empty)
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = customRule check (emptyState Set.empty)
   where
     code = "DL4001"
     severity = DLWarningC

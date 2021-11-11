@@ -29,9 +29,10 @@ dependencies:
   - containers
   - data-default
   - language-docker >=10.3.0 && <11
-  - megaparsec >= 9.0.0
+  - megaparsec >= 9.2.0
   - optparse-applicative >= 0.14.0
   - text
+  - hadolint-discover
 default-extensions:
   - DeriveAnyClass
   - DeriveGeneric
@@ -51,7 +52,7 @@ library:
     - Paths_hadolint
   dependencies:
     - &Prettyprint prettyprinter >= 1.7.0
-    - &ShellCheck ShellCheck >=0.7.1
+    - &ShellCheck ShellCheck >=0.8
     - &bytestring bytestring >=0.10
     - &split split >=0.2
     - Cabal
@@ -76,6 +77,7 @@ library:
     - time
     - timerep >= 2.0
     - void
+    - hadolint-discover
 
 executables:
   hadolint:

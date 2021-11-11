@@ -1,10 +1,11 @@
 module Hadolint.Rule.DL3023 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 
-rule :: Rule args
-rule = customRule check (emptyState Nothing)
+rule :: Configuration -> Rule args
+rule _ = customRule check (emptyState Nothing)
   where
     code = "DL3023"
     severity = DLErrorC

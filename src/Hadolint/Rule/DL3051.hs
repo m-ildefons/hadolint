@@ -2,12 +2,14 @@ module Hadolint.Rule.DL3051 (rule) where
 
 import qualified Data.Map as Map
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $ fmap labelIsNotEmptyRule (Map.keys labelschema)
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} =
+  mconcat $ fmap labelIsNotEmptyRule (Map.keys labelSchema)
 {-# INLINEABLE rule #-}
 
 labelIsNotEmptyRule :: LabelName -> Rule args

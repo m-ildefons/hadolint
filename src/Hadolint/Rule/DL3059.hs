@@ -1,5 +1,6 @@
 module Hadolint.Rule.DL3059 (rule) where
 
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
@@ -15,8 +16,8 @@ data Acc
 -- `&&`) because in that case the programmer most likely has deliberately
 -- chosen to use multiuple `RUN` instructions. Cases where --mount=xxx flags
 -- differ are excluded as well.
-rule :: Rule Shell.ParsedShell
-rule = customRule check (emptyState Empty)
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = customRule check (emptyState Empty)
   where
     code = "DL3059"
     severity = DLInfoC

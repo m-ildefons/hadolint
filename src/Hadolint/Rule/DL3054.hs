@@ -5,13 +5,14 @@ import qualified Data.Map as Map
 import qualified Data.Text as Text
 import Distribution.Parsec
 import Distribution.SPDX.Extra
+import Hadolint.Config.Configuration (Configuration (..))
 import Hadolint.Rule
 import Language.Docker.Syntax
 
 
-rule :: LabelSchema -> Rule args
-rule labelschema = mconcat $
-  fmap labelIsNotSPDXRule (Map.keys (Map.filter (== Spdx) labelschema))
+rule :: Configuration -> Rule args
+rule Configuration {labelSchema} = mconcat $
+  fmap labelIsNotSPDXRule (Map.keys (Map.filter (== Spdx) labelSchema))
 {-# INLINEABLE rule #-}
 
 labelIsNotSPDXRule :: LabelName -> Rule args

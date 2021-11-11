@@ -2,11 +2,12 @@ module Hadolint.Rule.DL3006 (rule) where
 
 import qualified Data.Set as Set
 import Data.Text (Text)
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax
 
-rule :: Rule args
-rule = customRule check (emptyState Set.empty)
+rule :: Configuration -> Rule args
+rule _ = customRule check (emptyState Set.empty)
   where
     code = "DL3006"
     severity = DLWarningC

@@ -2,11 +2,12 @@ module Hadolint.Rule.DL3000 (rule) where
 
 import qualified Data.Char as Char
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import Language.Docker.Syntax (Instruction (..))
 
-rule :: Rule args
-rule = simpleRule code severity message check
+rule :: Configuration -> Rule args
+rule _ = simpleRule code severity message check
   where
     code = "DL3000"
     severity = DLErrorC

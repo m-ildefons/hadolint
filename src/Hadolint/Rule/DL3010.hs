@@ -6,6 +6,7 @@ import Data.List.NonEmpty (NonEmpty)
 import qualified Data.Set as Set
 import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
+import Hadolint.Config.Configuration (Configuration)
 import Hadolint.Rule
 import qualified Hadolint.Shell as Shell
 import Language.Docker.Syntax
@@ -18,8 +19,8 @@ data Acc
       }
   | Empty
 
-rule :: Rule Shell.ParsedShell
-rule = veryCustomRule check (emptyState Empty) markFailures
+rule :: Configuration -> Rule Shell.ParsedShell
+rule _ = veryCustomRule check (emptyState Empty) markFailures
   where
     code = "DL3010"
     severity = DLInfoC

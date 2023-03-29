@@ -4,8 +4,34 @@ packages:
 optional-packages:
   vendored/**/*.cabal
 
+-- source-repository-package
+--     type: git
+--     location: https://github.com/lorenzo/shellcheck
+--     tag: 07095b233a60b819df6710b7741a59bac62179e1
+--     --sha256: 114yfgp40klrm32al93j7fh7lzzg7scqqnf8cc953h2m22k0c48q
+
 source-repository-package
     type: git
-    location: https://github.com/lorenzo/shellcheck
-    tag: 07095b233a60b819df6710b7741a59bac62179e1
-    --sha256: 114yfgp40klrm32al93j7fh7lzzg7scqqnf8cc953h2m22k0c48q
+    location: https://github.com/m-ildefons/shellcheck
+    tag: 300ed94a1e359b3d1ebfc1050f7c1a9df3ec5907
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/spdx
+    tag: 6b6cd73a275fbff24c4c85132e750393e6a36587
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/colourista
+    tag: 228eef463e4d1fac826e0408becb48ef6ce31f52
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/foundation
+    tag: 873f2c35bb7c77fb432a7a79e1acb5230c66b6c2
+    subdir: basement
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/hs-memory
+    tag: c5849df3dc2c5ba35f2a8a8e960a77badcc61275

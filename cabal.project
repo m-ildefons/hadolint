@@ -28,10 +28,16 @@ source-repository-package
 source-repository-package
     type: git
     location: https://github.com/m-ildefons/foundation
-    tag: 873f2c35bb7c77fb432a7a79e1acb5230c66b6c2
+    tag: 4316929e6cbca027e25349710a71548f8f26220a
     subdir: basement
 
 source-repository-package
     type: git
     location: https://github.com/m-ildefons/hs-memory
-    tag: c5849df3dc2c5ba35f2a8a8e960a77badcc61275
+    tag: 22f20394bb7efacde1dcc68c300133b4002854b9
+
+-- source-repository-package
+--     type: git
+--     location: https://github.com/m-ildefons/directory
+--     tag: 98035ca7f7ce185ebf218d2809c0b9262b974b3f
+--     post-checkout-command: autoreconf -fi

@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module Hadolint.Config.Configfile
   ( getConfigFromFile
   )
@@ -9,12 +11,14 @@ import Data.YAML as Yaml
 import qualified Data.ByteString as Bytes
 import Hadolint.Config.Configuration (PartialConfiguration (..))
 import System.Directory
-  ( XdgDirectory (..),
-    doesFileExist,
+  ( doesFileExist,
     getCurrentDirectory,
     getAppUserDataDirectory,
     getUserDocumentsDirectory,
+#if !defined(__wasi__)
+    XdgDirectory (..),
     getXdgDirectory,
+#endif
   )
 import System.FilePath ((</>))
 import System.IO (hPrint, stderr)
@@ -80,6 +84,7 @@ getConfig maybeConfig =
 --  - $HOME/.hadolint.{yaml|yml}
 -- The first file found is used, all other are ignored.
 findConfig :: IO (Maybe FilePath)
+#if !defined(__wasi__)
 findConfig = do
   filesInCWD <- traverse
                   (\filePath -> (</> filePath) <$> getCurrentDirectory)
@@ -94,7 +99,15 @@ findConfig = do
   listToMaybe
     <$> filterM
           doesFileExist
-          (filesInCWD <> filesInXdgConfig <> filesInAppData <> filesInHome)
+          ( filesInCWD
+            <> filesInXdgConfig
+            <> filesInAppData
+            <> filesInHome
+          )
+#else
+findConfig =
+  return Nothing
+#endif
   where
     hiddenConfigs = [".hadolint.yaml", ".hadolint.yml"]
     visibleConfigs = ["hadolint.yaml", "hadolint.yml"]

@@ -29,11 +29,11 @@ jobs:
           - os: ubuntu-latest
             target: linux-amd64
             ghcup: https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
-            ghc: 9.2.8
+            ghc: 9.10.1
           - os: ubuntu-24.04-arm
             target: linux-arm64
             ghcup: https://downloads.haskell.org/~ghcup/aarch64-linux-ghcup
-            ghc: 9.8.2
+            ghc: 9.10.1
     steps:
 
       - name: Workaround to make checkout work on Alpine arm64

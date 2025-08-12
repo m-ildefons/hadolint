@@ -20,6 +20,8 @@ jobs:
       image: alpine:3.21
       volumes:
         - /:/host
+        - /opt:/opt:rw,rshared
+        - /opt:/__e/node20:ro,rshared
     strategy:
       fail-fast: false
       matrix:
@@ -33,6 +35,14 @@ jobs:
             ghcup: https://downloads.haskell.org/~ghcup/aarch64-linux-ghcup
             ghc: 9.8.2
     steps:
+
+      - name: Workaround to make checkout work on Alpine arm64
+        run: |
+          sed -i "/^ID=/s/alpine/NotpineForGHA/" /etc/os-release
+          apk add nodejs --update-cache
+          mkdir /opt/bin
+          ln -sf /usr/bin/node /opt/bin/node
+
       - name: Install system dependencies
         run: |
           apk add --no-cache curl gcc g++ gmp-dev ncurses-dev libffi-dev make xz gzip tar perl git bash sudo binutils-gold

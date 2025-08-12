@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-24.04-arm
             target: linux-arm64
             ghcup: https://downloads.haskell.org/~ghcup/aarch64-linux-ghcup
-            ghc: -u https://downloads.haskell.org/~ghcup/unofficial-bindists/ghc/9.6.7/ghc-9.6.7-aarch64-alpine-linux.tar.xz 9.6.7-aarch-musl
+            ghc: 9.10.1
     steps:
 
       - name: Workaround to make checkout work on Alpine arm64
@@ -83,16 +83,12 @@ jobs:
           path: ~/.cabal/store
           key: ${{ matrix.os }}-${{ hashFiles('cabal.project.freeze') }}
 
-      - name: Install cabal dependencies
-        run: cabal build --only-dependencies --disable-shared --ghc-options='-split-sections -optl-static -fPIC'
-        shell: bash
-
-      - name: Install
-        run: cabal install --installdir="$HOME/.local/bin" --install-method=copy --overwrite-policy=always --enable-executable-static --disable-executable-dynamic --disable-shared --ghc-options='-split-sections -optl-static -optl-pthread -fPIC'
-        shell: bash
-
-      - name: Strip
-        run: strip ~/.local/bin/hadolint
+      - name: Build
+        run: |
+          cabal build --only-dependencies --disable-shared --ghc-options='-split-sections -optl-static -fPIC'
+          cabal build --enable-executable-static --disable-executable-dynamic --disable-shared --ghc-options='-split-sections -optl-static -optl-pthread -fPIC'
+          mv "$(cabal list-bin hadolint)" ~/.local/bin/hadolint
+          strip ~/.local/bin/hadolint
         shell: bash
 
       - name: Upload Artifact

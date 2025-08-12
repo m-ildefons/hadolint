@@ -27,6 +27,11 @@ jobs:
           - os: ubuntu-latest
             target: linux-amd64
             ghcup: https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
+            ghc: 9.2.8
+          - os: ubuntu-24.04-arm
+            target: linux-arm64
+            ghcup: https://downloads.haskell.org/~ghcup/aarch64-linux-ghcup
+            ghc: 9.8.2
     steps:
       - name: Install system dependencies
         run: |
@@ -42,7 +47,7 @@ jobs:
 
       - name: Install GHC and cabal
         run: |
-          ghcup install ghc   --force -i /usr/local     9.2.8
+          ghcup install ghc   --force -i /usr/local ${{ matrix.ghc }}
           ghcup install cabal --force -i /usr/local/bin
         shell: bash
 
@@ -93,8 +98,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04-arm
-            target: linux-arm64
           - os: macos-13
             target: macos-x86_64
           - os: macos-14

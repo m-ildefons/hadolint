@@ -1,0 +1,95 @@
+name: Release Online
+on:
+  # Trigger the workflow on the new 'v*' tag created
+  push:
+    tags:
+      - "v*"
+
+  # also on manual trigger
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'The version number for the release'
+        required: true
+
+jobs:
+  build-js:
+    name: Create JS for Web-Version
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:3.21
+      volumes:
+        - /:/host
+        - /opt:/opt:rw,rshared
+        - /opt:/__e/node20:ro,rshared
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: unknown-js
+            ghcup: https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
+            ghc: -u https://downloads.haskell.org/~ghcup/unofficial-bindists/ghc/javascript-unknown-ghcjs-9.10.2/ghc-javascript-unknown-ghcjs-9.10.2-x86_64-linux-rocky-8.10.tar.xz 9.10.2-js
+
+    steps:
+
+      - name: Workaround to make checkout work on Alpine arm64
+        run: |
+          sed -i "/^ID=/s/alpine/NotpineForGHA/" /etc/os-release
+          apk add nodejs --update-cache
+          mkdir /opt/bin
+          ln -sf /usr/bin/node /opt/bin/node
+
+      - name: Install system dependencies
+        run: |
+          apk add --no-cache curl gcc g++ gmp-dev ncurses-dev libffi-dev make xz gzip tar perl git bash sudo binutils-gold
+          apk add --no-cache zlib zlib-dev zlib-static gmp gmp-dev ncurses-static libc-dev libffi-dev musl-dev
+
+      - name: Install ghcup
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf ${{ matrix.ghcup }}  > /usr/bin/ghcup
+          chmod +x /usr/bin/ghcup
+          echo "$HOME/.ghcup/bin" $GITHUB_PATH
+        shell: bash
+
+      - name: Install GHC and cabal
+        run: |
+          ghcup install ghc   --force -i /usr/local ${{ matrix.ghc }}
+          ghcup install cabal --force -i /usr/local/bin
+        shell: bash
+
+      - uses: actions/checkout@v4
+
+      - name: Update cabal cache
+        run: cabal update
+        shell: bash
+
+      - name: create ~/.local/bin
+        run: mkdir -p "$HOME/.local/bin"
+        shell: bash
+
+      - run: echo "HOME=$HOME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Freeze
+        run: cabal freeze
+
+      - name: Cache store
+        uses: actions/cache@v4.2.0
+        with:
+          path: ~/.cabal/store
+          key: ${{ matrix.os }}-${{ hashFiles('cabal.project.freeze') }}
+
+      - name: Build
+        run: |
+          cabal build --only-dependencies --disable-shared --ghc-options='-split-sections -optl-static -fPIC'
+          cabal build --enable-executable-static --disable-executable-dynamic --disable-shared --ghc-options='-split-sections -optl-static -optl-pthread -fPIC'
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hadolint-${{ matrix.target }}
+          path: ~/.local/bin/hadolint
+          retention-days: 3

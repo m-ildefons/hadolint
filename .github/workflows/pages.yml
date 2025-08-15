@@ -36,7 +36,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update
-          apt-get install -y autoconf gcc g++ libffi-dev curl liblzma-dev git xz-utils make
+          apt-get install -y autoconf gcc g++ libffi-dev curl liblzma-dev git xz-utils make python3
 
       - name: Install ghcup and cabal
         run: |

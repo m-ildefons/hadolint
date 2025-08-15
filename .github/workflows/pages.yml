@@ -70,7 +70,7 @@ jobs:
       - name: Freeze
         run: |
           cabal update
-          cabal freeze
+          cabal freeze -w /usr/local/bin/javascript-unknown-ghcjs-ghc --with-hc-pkg /usr/local/bin/javascript-unknown-ghcjs-ghc-pkg
 
       - name: Cache store
         uses: actions/cache@v4.2.0

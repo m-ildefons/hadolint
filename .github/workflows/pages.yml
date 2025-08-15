@@ -17,11 +17,9 @@ jobs:
     name: Create JS for Web-Version
     runs-on: ubuntu-latest
     container:
-      image: alpine:3.21
+      image: debian:bookworm
       volumes:
         - /:/host
-        - /opt:/opt:rw,rshared
-        - /opt:/__e/node20:ro,rshared
 
     strategy:
       fail-fast: false
@@ -30,40 +28,37 @@ jobs:
           - os: ubuntu-latest
             target: unknown-js
             ghcup: https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
-            ghc: -u https://downloads.haskell.org/~ghcup/unofficial-bindists/ghc/javascript-unknown-ghcjs-9.10.2/ghc-javascript-unknown-ghcjs-9.10.2-x86_64-linux-rocky-8.10.tar.xz 9.10.2-js
+            ghc: javascript-unknown-ghcjs-9.10.2
+            emsdk: 3.1.74
 
     steps:
 
-      - name: Workaround to make checkout work on Alpine arm64
-        run: |
-          sed -i "/^ID=/s/alpine/NotpineForGHA/" /etc/os-release
-          apk add nodejs --update-cache
-          mkdir /opt/bin
-          ln -sf /usr/bin/node /opt/bin/node
-
       - name: Install system dependencies
         run: |
-          apk add --no-cache curl gcc g++ gmp-dev ncurses-dev libffi-dev make xz gzip tar perl git bash sudo binutils-gold
-          apk add --no-cache zlib zlib-dev zlib-static gmp gmp-dev ncurses-static libc-dev libffi-dev musl-dev
+          apt-get update
+          apt-get install -y autoconf gcc g++ libffi-dev curl liblzma-dev git xz-utils make
 
-      - name: Install ghcup
+      - name: Install ghcup and cabal
         run: |
           curl --proto '=https' --tlsv1.2 -sSf ${{ matrix.ghcup }}  > /usr/bin/ghcup
           chmod +x /usr/bin/ghcup
           echo "$HOME/.ghcup/bin" $GITHUB_PATH
-        shell: bash
-
-      - name: Install GHC and cabal
-        run: |
-          ghcup install ghc   --force -i /usr/local ${{ matrix.ghc }}
+          ghcup config add-release-channel cross
           ghcup install cabal --force -i /usr/local/bin
         shell: bash
 
-      - uses: actions/checkout@v4
-
-      - name: Update cabal cache
-        run: cabal update
+      - name: Install emscripten and GHC
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install ${{ matrix.emsdk }}
+          ./emsdk activate ${{ matrix.emsdk }}
+          source ./emsdk_env.sh
+          emconfigure ghcup install ghc --force -i /usr/local --set ${{ matrix.ghc }}
+          ln -sf /usr/local/bin/javascript-unknown-ghcjs-hsc2hs /usr/local/bin/hsc2hs-ghc-9.10.2
         shell: bash
+
+      - uses: actions/checkout@v4
 
       - name: create ~/.local/bin
         run: mkdir -p "$HOME/.local/bin"
@@ -73,7 +68,9 @@ jobs:
         shell: bash
 
       - name: Freeze
-        run: cabal freeze
+        run: |
+          cabal update
+          cabal freeze
 
       - name: Cache store
         uses: actions/cache@v4.2.0
@@ -83,8 +80,8 @@ jobs:
 
       - name: Build
         run: |
-          cabal build --only-dependencies --disable-shared --ghc-options='-split-sections -optl-static -fPIC'
-          cabal build --enable-executable-static --disable-executable-dynamic --disable-shared --ghc-options='-split-sections -optl-static -optl-pthread -fPIC'
+          source /emsdk/emsdk_env.sh
+          emconfigure cabal build -w /usr/local/bin/javascript-unknown-ghcjs-ghc --with-hc-pkg /usr/local/bin/javascript-unknown-ghcjs-ghc-pkg
         shell: bash
 
       - name: Upload Artifact

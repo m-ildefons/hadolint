@@ -1,0 +1,46 @@
+# Runs on pull requests against master, and on master branch
+# This check ensures that Hackage packaging standards are met.
+
+name: Hackage Checks
+
+on:
+  push:
+    branches:
+      - master
+      - ci/*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/hackage.yml'
+      - 'cabal.project'
+      - 'hadolint.cabal'
+
+jobs:
+  hadolint:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            ghc: 9.10.2
+
+    steps:
+
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Setup Haskell
+        id: setup-haskell-cabal
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+
+      - name: Build
+        run: |
+          cabal check | tee output.txt
+          # cabal always exits without error. This is so the workflow fails if
+          # errors have been found.
+          grep "No errors or warnings could be found in the package." output.txt

@@ -1,0 +1,35 @@
+# Runs on pull requests against master, and on master branch
+# Use Hadolint on our own Dockerfile
+
+name: Dockerfile Lint
+
+on:
+  push:
+    branches:
+      - master
+      - ci/*
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/dockerfile.yml'
+      - 'docker/Dockerfile'
+
+jobs:
+  hadolint:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+
+    steps:
+
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/Dockerfile

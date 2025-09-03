@@ -6,8 +6,10 @@ on:
   push:
     branches:
       - master
+      - ci/*
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
     paths:
       - '.github/workflows/hlint.yml'
       - 'app/**/*.hs'
@@ -15,7 +17,16 @@ on:
       - 'test/**/*.hs'
 jobs:
   hlint:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            hlint: 3.1.6  # default for actions-hlint-setup
+          - os: ubuntu-latest
+            hlint: '3.10'
+
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       HLINT_ACTION_LOG_LEVEL: debug
@@ -25,6 +36,8 @@ jobs:
 
       - name: Set up HLint
         uses: rwe/actions-hlint-setup@v1
+        with:
+          version: ${{ matrix.hlint }}
 
       - name: Haskell Lint
         uses: rwe/actions-hlint-run@v2

@@ -24,7 +24,7 @@ dl3047 = simpleRule code severity message check
 
     forgotProgress cmd = isWget cmd && (not (hasProgressOption cmd) && not (hasSpecialFlags cmd))
     isWget (Shell.Command name _ _) = name == "wget"
-    hasProgressOption cmd = Shell.hasFlag "progress" cmd
+    hasProgressOption = Shell.hasFlag "progress"
 
     hasSpecialFlags cmd =
       Shell.hasAnyFlag ["q", "quiet"] cmd

@@ -3,3 +3,13 @@ packages:
 
 optional-packages:
   vendored/**/*.cabal
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/spdx.git
+    tag: ghc-9.12.2
+
+source-repository-package
+    type: git
+    location: https://github.com/m-ildefons/puresat.git
+    tag: 753d4827db019ff47bc5d1190e5db80027c19f14

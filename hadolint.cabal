@@ -1,0 +1,31 @@
+cabal-version:      2.0
+name:               hadolint-embedded
+version:            2.14.0
+synopsis:           Dockerfile Linter
+description:
+  An embedded version of the Hadolint dockerfile linter for web-assembly
+  runtimes on the web.
+
+category:           Development
+homepage:           http://hadolint.github.io/hadolint
+author:             Moritz Röhrich
+maintainer:         moritz@ildefons.de
+copyright:          Lukas Martinelli
+license:            GPL-3
+license-file:       LICENSE
+build-type:         Simple
+
+executable hadolint
+  main-is:            hadolint.hs
+  hs-source-dirs:     app
+  ghc-options:
+    -no-hs-main -optl-mexec-model=reactor -optl-Wl,--export=setup -o hadolint.wasm
+  build-depends:
+    base                    >=4.20.1    && <4.21
+    , ghc-experimental
+    , containers            >=0.7       && <0.8
+    , data-default          >=0.8.0     && <0.9
+    , hadolint              >=2.14.0    && <3
+    , language-docker       >=15.0.0    && <16
+    , text                  >=2.1.2     && <2.2
+  default-language:   GHC2021

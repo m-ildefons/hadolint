@@ -1,0 +1,23 @@
+packages: hadolint.cabal
+
+if arch(wasm32)
+  shared: True
+
+allow-newer:
+  time
+
+source-repository-package
+  type: git
+  location: https://github.com/haskell-wasm/network
+  tag: ab92e48e9fdf3abe214f85fdbe5301c1280e14e9
+
+source-repository-package
+  type: git
+  location: https://github.com/m-ildefons/haskell-xml
+  tag: 755c749efe70bcaefa7d182dc62f70cb79f45a32
+  subdir: xml-conduit
+
+source-repository-package
+  type: git
+  location: https://github.com/m-ildefons/hadolint
+  tag: 5f72e8300bb92511e074b4c399c88238950a617b

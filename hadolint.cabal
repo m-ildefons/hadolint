@@ -162,7 +162,7 @@ library
     , spdx                  >=1.1      && <1.2
     , split                 >=0.2.5    && <0.3
     , text                  >=2.1.2    && <2.2
-    , time                  >=1.12.2   && <1.13
+    , time                  >=1.14     && <1.15
     , timerep               >=2.1.0    && <2.2
     , void                  >=0.7.3    && <0.8
     , xml-conduit           >=1.10.0   && <1.11
@@ -189,7 +189,7 @@ executable hadolint
   ghc-options:
     -Wall -Wcompat -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wredundant-constraints
-    -optP-Wno-nonportable-include-path -flate-dmd-anal -threaded
+    -optP-Wno-nonportable-include-path -flate-dmd-anal
     -rtsopts "-with-rtsopts=-N5 -A4m"
 
   build-depends:

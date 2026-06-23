@@ -22,7 +22,8 @@ hadolint.github.io/hadolint**](https://hadolint.github.io/hadolint)
 ## Table of Contents
 
 - [How to use](#how-to-use)
-- [Install](#install)
+- [Installation](#installation)
+- [Integrations](#integrations)
 - [CLI](#cli)
 - [Configure](#configure)
 - [Non-Posix Shells](#non-posix-shells)
@@ -31,7 +32,6 @@ hadolint.github.io/hadolint**](https://hadolint.github.io/hadolint)
   - [Global ignores](#global-ignores)
 - [Linting Labels](#linting-labels)
   - [Note on dealing with variables in labels](#note-on-dealing-with-variables-in-labels)
-- [Integrations](#integrations)
 - [Rules](#rules)
 - [Develop](#develop)
   - [Setup](#setup)
@@ -75,30 +75,68 @@ or using Windows PowerShell:
 cat .\Dockerfile | docker run --rm -i hadolint/hadolint
 ```
 
-## Install
+## Installation
 
-You can download prebuilt binaries for OSX, Windows and Linux from the latest
-[release page][]. However, if this does not work for you, please fall back to
-container (Docker), `brew` or source installation.
+You can find pre-compiled binaries for Hadolint on the [release page][]. In addition to that,
+Hadolint can be installed from source.
 
-On OSX, you can use [brew](https://brew.sh/) to install `hadolint`.
+<details>
+<summary>From source repository</summary>
+
+To build `hadolint` locally, you need [GHC][] v9.10.2 and the [Cabal][] build tool to build the binary.
+
+```bash
+git clone https://github.com/hadolint/hadolint
+cd hadolint
+cabal configure
+cabal build
+cabal install
+```
+
+</details>
+
+
+<details>
+<summary>Using Cabal using source code from Hackage</summary>
+
+
+You need [GHC][] v9.10.2 and the [Cabal][] build tool to build the binary. Cabal will automatically
+fetch the source code from [Hackage][] and compile it.
+
+```bash
+cabal install hadolint
+```
+
+</details>
+
+<details>
+<summary>Using Brew on MacOS, Linux and WSL</summary>
+
+An easy and popular method for installing Hadolint on MacOS, Linux and WSL is [brew][]:
 
 ```bash
 brew install hadolint
 ```
 
-On Windows, you can use [scoop](https://github.com/lukesampson/scoop) to
-install `hadolint`.
+</details>
+
+<details>
+<summary>Using Scoop on Windows</summary>
+
+[Scoop](https://github.com/lukesampson/scoop) is a command line software manager for Windows.
+Install Hadolint with:
 
 ```batch
 scoop install hadolint
 ```
 
-On distributions that have `nix` installed, you can use the `hadolint`
-package to run ad-hoc shells or permanently install `hadolint` into
-your environment.
+</details>
 
-As mentioned earlier, `hadolint` is available as a container image:
+<details>
+<summary>Container Images for Docker/Podman</summary>
+
+As mentioned earlier, `hadolint` is available as a container image on Dockerhub and GitHub container
+registries:
 
 ```bash
 docker pull hadolint/hadolint
@@ -117,30 +155,21 @@ docker pull hadolint/hadolint:latest-alpine
 docker pull ghcr.io/hadolint/hadolint:latest-debian
 # OR
 docker pull ghcr.io/hadolint/hadolint:latest-alpine
+
 ```
 
-You can also build `hadolint` locally. You need [Haskell][] and the [cabal][]
-build tool to build the binary.
+</details>
 
-```bash
-git clone https://github.com/hadolint/hadolint \
-  && cd hadolint \
-  && cabal configure \
-  && cabal build \
-  && cabal install
-```
+## Integrations
 
-If you want the
-[VS Code Hadolint](https://github.com/michaellzc/vscode-hadolint)
-extension to use Hadolint in a container, you can use the following
-[wrapper script](https://github.com/hadolint/hadolint/issues/691#issuecomment-932116329):
+To get most of `hadolint`, it is useful to integrate it as a check in your CI
+or into your editor, or as a pre-commit hook, to lint your `Dockerfile` as you
+write it. See our [Integration][] docs.
 
-```bash
-#!/bin/bash
-dockerfile="$1"
-shift
-docker run --rm -i hadolint/hadolint hadolint "$@" - < "$dockerfile"
-```
+- [Code Review Platform Integrations][]
+- [Continuous Integrations][]
+- [Editor Integrations][]
+- [Version Control Integrations][]
 
 ## CLI
 
@@ -219,7 +248,8 @@ platform specific equivalents in this order and uses the first one exclusively:
 In windows, the `%LOCALAPPDATA%` environment variable is used instead of
 `XDG_CONFIG_HOME`. Config files can have either `yaml` or `yml` extensions.
 
-`hadolint` full `yaml` config file schema
+<details>
+<summary>Hadolint full YAML config file schema</summary>
 
 ```yaml
 failure-threshold: string               # name of threshold level (error | warning | info | style | ignore | none)
@@ -245,9 +275,14 @@ disable-ignore-pragma: boolean          # true | false
 trustedRegistries: string | [string]    # registry or list of registries
 ```
 
+</details>
+
 `hadolint` supports specifying the ignored rules using a configuration
-file. The configuration file should be in `yaml` format. This is one
-valid configuration file as an example:
+file. The configuration file should be in `yaml` format.
+Here are several valid configuration examples:
+
+<details>
+<summary>Ignore rules DL3000 and SC1010</summary>
 
 ```yaml
 ignored:
@@ -255,22 +290,22 @@ ignored:
   - SC1010
 ```
 
-Additionally, `hadolint` can warn you when images from untrusted
-repositories are being used in Dockerfiles, you can append the
-`trustedRegistries` keys to the configuration file, as shown below:
+</details>
+
+<details>
+<summary>Warn when images are not sourced from a trusted registry</summary>
 
 ```yaml
-ignored:
-  - DL3000
-  - SC1010
-
 trustedRegistries:
   - docker.io
   - my-company.com:5000
   - "*.gcr.io"
 ```
 
-If you want to override the severity of specific rules, you can do that too:
+</details>
+
+<details>
+<summary>Override the severity of specific rules</summary>
 
 ```yaml
 override:
@@ -286,8 +321,10 @@ override:
     - DL3015
 ```
 
-`failure-threshold` Exit with failure code only when rules with a
-severity above THRESHOLD are violated (Available in v2.6.0+)
+</details>
+
+<details>
+<summary>Exit with failure code only when rules with a severity above a threshold are violated</summary>
 
 ```yaml
 failure-threshold: info
@@ -298,6 +335,7 @@ override:
   info:
     - DL3032
 ```
+</details>
 
 Additionally, you can pass a custom configuration file in the command line with
 the `--config` option
@@ -450,17 +488,6 @@ To allow this, the label schema must specify `text` as value for that label:
 label-schema:
   version: text
 ```
-
-## Integrations
-
-To get most of `hadolint`, it is useful to integrate it as a check in your CI
-or into your editor, or as a pre-commit hook, to lint your `Dockerfile` as you
-write it. See our [Integration][] docs.
-
-- [Code Review Platform Integrations][]
-- [Continuous Integrations][]
-- [Editor Integrations][]
-- [Version Control Integrations][]
 
 ## Rules
 
@@ -715,8 +742,9 @@ cabal test
 [best practice]: https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices
 [shellcheck]: https://github.com/koalaman/shellcheck
 [release page]: https://github.com/hadolint/hadolint/releases/latest
-[haskell]: https://www.haskell.org/downloads/
-[cabal]: https://www.haskell.org/cabal/
+[GHC]: https://www.haskell.org/ghcup/
+[Cabal]: https://www.haskell.org/cabal/
+[Hackage]: https://hackage-content.haskell.org/package/hadolint
 [integration]: docs/INTEGRATION.md
 [code review platform integrations]: docs/INTEGRATION.md#code-review
 [continuous integrations]: docs/INTEGRATION.md#continuous-integration
@@ -731,3 +759,4 @@ cabal test
 [githash]: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection
 [spdxid]: https://spdx.org/licenses/
 [rfc5322]: https://www.ietf.org/rfc/rfc5322.txt
+[brew]: https://brew.sh/

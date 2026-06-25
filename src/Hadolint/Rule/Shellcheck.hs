@@ -47,8 +47,8 @@ scrule = customRule check (emptyState Empty)
 
     runShellCheck line options script =
       Set.fromList
-        [ toFailure line c
-          | c <- Shell.shellcheck options script
+        [ toFailure line options c script
+          | c <- Shell.shellcheck options ( Shell.scriptWithPreamble options script )
         ]
 {-# INLINEABLE scrule #-}
 
@@ -191,16 +191,22 @@ shellPragma sh Acc {..} = do
 
 -- | Converts ShellCheck errors into our own errors type
 toFailure :: Linenumber ->
+  Shell.ShellOpts ->
   ShellCheck.Interface.PositionedComment ->
+  Shell.ParsedShell ->
   CheckFailure
-toFailure line c =
+toFailure line opts c (Shell.ParsedShell rawScript _ _) =
   CheckFailure
     { code = RuleCode $ Text.pack ("SC" ++ show (code c)),
       severity = getDLSeverity $ severity c,
       message = Text.pack (message c),
-      line = line
+      line = correctedLine
     }
   where
+    correctedLine
+      | "#!" `Text.isPrefixOf` rawScript = line + position c
+      | otherwise = line + position c - ( 1 + Set.size ( Shell.envVars opts) ) - 1
+    position = fromInteger . ShellCheck.Interface.posLine . ShellCheck.Interface.pcStartPos
     severity pc =
       ShellCheck.Interface.cSeverity $ ShellCheck.Interface.pcComment pc
     code pc = ShellCheck.Interface.cCode $ ShellCheck.Interface.pcComment pc

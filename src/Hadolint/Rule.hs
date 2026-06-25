@@ -226,11 +226,9 @@ veryCustomRule ::
   Rule args
 veryCustomRule step = Foldl.Fold (withLineNumber step)
 
-foldArguments :: (a -> b) -> Arguments a -> b
-foldArguments applyRule args =
-  case args of
-    ArgumentsText as -> applyRule as
-    ArgumentsList as -> applyRule as
+foldArguments ::(a -> b) -> Arguments a -> b
+foldArguments applyRule (ArgumentsText as) = applyRule as
+foldArguments applyRule (ArgumentsList as) = applyRule as
 
 -- | Returns the result of running the check function on the image alias
 --   name, if the passed instruction is a FROM instruction with a stage alias.

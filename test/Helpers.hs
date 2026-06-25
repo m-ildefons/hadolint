@@ -90,6 +90,14 @@ onBuildRuleCatchesNot ruleCode dockerfile = assertOnBuildChecks dockerfile f
   where
     f = failsWith 0 ruleCode
 
+ruleCatchesAt :: (HasCallStack, ?config :: Configuration) => Int -> RuleCode -> Text.Text -> Assertion
+ruleCatchesAt expectedLine expectedCode dockerfile =
+  assertChecks dockerfile $ failsWithSomeAt expectedLine expectedCode
+
+ruleCatchesNotAt :: (HasCallStack, ?config :: Configuration) => Int -> RuleCode -> Text.Text -> Assertion
+ruleCatchesNotAt line code dockerfile =
+  assertChecks dockerfile $ failsWithAt 0 code line
+
 formatChecksNoColor :: Foldable f => f CheckFailure -> Text.Text
 formatChecksNoColor = Foldl.fold (Foldl.premap (\c -> formatCheck True "line" c <> "\n") Foldl.mconcat)
 
@@ -108,6 +116,27 @@ failsWith times expectedCode failures =
         <> (Text.unpack . formatChecksNoColor $ matched)
   where
     matched = Seq.filter (\CheckFailure {code} -> expectedCode == code) failures
+
+failsWithSomeAt :: HasCallStack => Int -> RuleCode -> Failures -> Assertion
+failsWithSomeAt expectedLine expectedCode failures =
+  when (null matched) $ assertFailure $
+    "I was expecting to catch at least one error for " <> show (unRuleCode expectedCode)
+      <> " at line " <> show expectedLine
+      <> ". Found: \n"
+      <> (Text.unpack . formatChecksNoColor $ matched)
+  where
+    matched = Seq.filter (\CheckFailure {code, line} -> expectedCode == code && expectedLine == line) failures
+
+failsWithAt :: HasCallStack => Int -> RuleCode -> Int -> Failures -> Assertion
+failsWithAt times expectedCode expectedLine failures =
+  when (length matched /= times) $ assertFailure $
+    "I was expecting to catch exactly " <> show times
+      <> " error(s) for " <> show (unRuleCode expectedCode)
+      <> " at line " <> show expectedLine
+      <> ". Found: \n"
+      <> (Text.unpack . formatChecksNoColor $ matched)
+  where
+    matched = Seq.filter (\CheckFailure {code, line} -> expectedCode == code && expectedLine == line) failures
 
 failsShellcheck :: HasCallStack => Failures -> Assertion
 failsShellcheck checks =

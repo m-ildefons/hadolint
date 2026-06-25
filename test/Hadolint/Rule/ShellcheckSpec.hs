@@ -225,3 +225,47 @@ spec = do
               ]
        in do
             assertChecks dockerfile passesShellcheck
+
+    it "Shellcheck errors on the right line with multiline RUN instructions" $
+      let dockerfile =
+            Text.unlines
+              [ "RUN foobar \\",
+                "    barfoo \\",
+                "    foobar-$barfoo \\",
+                "    foofoo \\",
+                "    barbar \\",
+                "    barfoo-$foobar"
+              ]
+       in do
+            ruleCatchesNotAt 1 "SC2086" dockerfile
+            ruleCatchesNotAt 2 "SC2086" dockerfile
+            ruleCatchesAt 3 "SC2086" dockerfile
+            ruleCatchesNotAt 4 "SC2086" dockerfile
+            ruleCatchesNotAt 5 "SC2086" dockerfile
+            ruleCatchesAt 6 "SC2086" dockerfile
+
+    it "Shellcheck errors on the right line with heredoc in RUN instruction" $
+      let dockerfile =
+            Text.unlines
+              [ "RUN <<EOF",
+                "#!/bin/bash",
+                "",
+                "foobar",
+                "barfoo",
+                "foobar-$barfoo",
+                "foofoo",
+                "barbar",
+                "barfoo-$foobar",
+                "EOF"
+              ]
+       in do
+            ruleCatchesNotAt 1 "SC2086" dockerfile
+            ruleCatchesNotAt 2 "SC2086" dockerfile
+            ruleCatchesNotAt 3 "SC2086" dockerfile
+            ruleCatchesNotAt 4 "SC2086" dockerfile
+            ruleCatchesNotAt 5 "SC2086" dockerfile
+            ruleCatchesAt 6 "SC2086" dockerfile
+            ruleCatchesNotAt 7 "SC2086" dockerfile
+            ruleCatchesNotAt 8 "SC2086" dockerfile
+            ruleCatchesAt 9 "SC2086" dockerfile
+            ruleCatchesNotAt 10 "SC2086" dockerfile

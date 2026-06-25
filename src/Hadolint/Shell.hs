@@ -84,9 +84,9 @@ addVars vars (ShellOpts n v) = ShellOpts n (v <> Set.fromList vars)
 setShell :: Text.Text -> ShellOpts -> ShellOpts
 setShell s (ShellOpts _ v) = ShellOpts s v
 
-shellcheck :: ShellOpts -> ParsedShell -> [PositionedComment]
-shellcheck (ShellOpts sh env) (ParsedShell txt _ _) =
-  if any (`Text.isInfixOf` sh) nonPosixShells || hasUnsupportedShebang txt
+shellcheck :: ShellOpts -> Text.Text -> [PositionedComment]
+shellcheck (ShellOpts sh _) script  =
+  if any (`Text.isInfixOf` sh) nonPosixShells || hasUnsupportedShebang script
     then [] -- Do no run for non-posix shells i.e. powershell, cmd.exe
     else runShellCheck
   where
@@ -95,21 +95,26 @@ shellcheck (ShellOpts sh env) (ParsedShell txt _ _) =
     spec =
       emptyCheckSpec
         { csFilename = "", -- filename can be omitted because we only want the parse results back
-          csScript = script,
+          csScript = Text.unpack script,
           csCheckSourced = False,
           csExcludedWarnings = exclusions,
           csShellTypeOverride = Nothing,
           csMinSeverity = StyleC
         }
-    script = Text.unpack $ "#!" <> extractShell sh <> "\n" <> printVars <> txt
     exclusions =
       [ 2187, -- exclude the warning about the ash shell not being supported
         1090, -- requires a directive (shell comment) that can't be expressed in a Dockerfile
         1091 -- requires a directive (shell comment) that can't be expressed in a Dockerfile
       ]
 
+scriptWithPreamble :: ShellOpts -> ParsedShell -> Text.Text
+scriptWithPreamble (ShellOpts sh env) (ParsedShell raw _ _)
+  | "#!" `Text.isPrefixOf` raw = raw
+  | otherwise = "#!" <> extractShell sh <> "\n" <> printVars <> raw
+  where
     extractShell s = fromMaybe "" (listToMaybe . Text.words $ s)
     printVars = Text.unlines . Set.toList $ Set.map (\v -> "export " <> v <> "=1") env
+
 
 nonPosixShells :: [Text.Text]
 nonPosixShells = ["pwsh", "powershell", "cmd"]

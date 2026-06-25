@@ -1,12 +1,12 @@
 packages:
   .
+  ../language-docker
 
 allow-newer:
   time
 
 optional-packages:
   vendored/**/*.cabal
-
 
 if arch(wasm32)
   shared: True
